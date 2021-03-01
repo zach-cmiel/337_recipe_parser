@@ -25,6 +25,8 @@ def parse_url(url):
     req = requests.get(url, headers)
     soup = BeautifulSoup(req.content, 'html.parser')
 
+    title = soup.find("h1",class_="headline heading-content").get_text().lstrip().rstrip()
+
     ingredient_spans = soup.find_all('span', class_='ingredients-item-name')
     ingredients = []
     for span in ingredient_spans:
@@ -37,7 +39,7 @@ def parse_url(url):
         instructions.append(step.find("div",class_="paragraph").get_text().lstrip().rstrip())
 
     ingredients_dict = get_ingredients(ingredients)
-    printer(ingredients_dict,instructions)
+    printer(title,ingredients_dict,instructions)
 
 #takes list of ingredients with measurements. Return dictionary with ingredient and measurement
 def get_ingredients(lst):
@@ -74,7 +76,8 @@ def read_in_url():
 
     parse_url(recipe_url)
 
-def printer(ingredients_dict,instructions_lst):
+def printer(title,ingredients_dict,instructions_lst):
+    print(title)
     print("Ingredients:")
     for k in ingredients_dict.keys():
         print("\t"+k+": "+ingredients_dict[k])
