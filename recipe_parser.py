@@ -1,6 +1,13 @@
 
 import requests
 from bs4 import BeautifulSoup
+import nltk
+nltk.download("wordnet")
+nltk.download("brown")
+from nltk.corpus import wordnet as wn
+from textblob import TextBlob
+import re
+from quantulum3 import parser
 
 
 headers = {
@@ -15,14 +22,55 @@ headers = {
 def parse_url(url):
     req = requests.get(url, headers)
     soup = BeautifulSoup(req.content, 'html.parser')
-    ingredient_spans = soup.find_all('span', class_='ingredients-item-name')
 
+    ingredient_spans = soup.find_all('span', class_='ingredients-item-name')
     ingredients = []
     for span in ingredient_spans:
         ingredient = span.get_text().lstrip().rstrip()
         ingredients.append(ingredient)
 
-    print(ingredients)
+    instructions_ul = soup.find_all("li",class_="subcontainer instructions-section-item")
+    instructions = []
+    for step in instructions_ul:
+        instructions.append(step.find("div",class_="paragraph").get_text().lstrip().rstrip())
+
+    print(get_ingredients(ingredients))
+
+#takes list of ingredients with measurements. Return dictionary with ingredient and measurement
+def get_ingredients(lst):
+    all = {}
+    for ingredient in lst:
+        quants = parser.parse(ingredient)
+        measurement = ""
+        if len(quants) == 0:
+            continue
+        if len(quants) == 2 and str(quants[0].unit) == "":
+            measurement = measurement + str(quants[0].value + quants[1].value)
+            measurement = measurement + " " + str(quants[1].unit)
+        else:
+            measurement = quants[0].surface
+
+        #delete measurements
+        for quant in quants:
+            ingredient = ingredient.replace(quant.surface,"")
+
+        blob = TextBlob(ingredient)
+
+        if len(blob.noun_phrases) == 0:
+            all[str(blob)] = measurement
+        elif len(blob.noun_phrases) == 1:
+            all[blob.noun_phrases[0]] = measurement
+
+    return all
+
+def if_food(word):
+    syns = wn.synsets(str(word), pos = wn.NOUN)
+
+    for syn in syns:
+        if "food" in syn.lexname():
+            return word
+    return
+
 
 # read in the allrecipes.com url -> SAMPLE URL TO TEST: https://www.allrecipes.com/recipe/280509/stuffed-french-onion-chicken-meatballs/
 def read_in_url():
