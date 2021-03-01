@@ -44,6 +44,7 @@ def get_ingredients(lst):
         quants = parser.parse(ingredient)
         measurement = ""
         if len(quants) == 0:
+            all[ingredient] = ""
             continue
         if len(quants) == 2 and str(quants[0].unit) == "":
             measurement = measurement + str(quants[0].value + quants[1].value)
