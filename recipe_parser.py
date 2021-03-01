@@ -8,6 +8,8 @@ from nltk.corpus import wordnet as wn
 from textblob import TextBlob
 import re
 from quantulum3 import parser
+import warnings
+warnings.simplefilter('ignore')
 
 
 headers = {
