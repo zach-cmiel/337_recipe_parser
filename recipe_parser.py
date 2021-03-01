@@ -77,7 +77,7 @@ def printer(ingredients_dict,instructions_lst):
         print("\t"+k+": "+ingredients_dict[k])
     print("Instructions:")
     for i,instruction in enumerate(instructions_lst):
-        print("\tStep " + str(i)+": "+instruction)
+        print("\tStep " + str(i+1)+": "+instruction)
 
 read_in_url()
 
