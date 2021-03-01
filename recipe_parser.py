@@ -49,7 +49,7 @@ def get_ingredients(lst):
             measurement = measurement + str(quants[0].value + quants[1].value)
             measurement = measurement + " " + str(quants[1].unit)
         else:
-            measurement = quants[0].surface
+            measurement = str(quants[0].value) + " "+ str(quants[0].unit)
 
         #delete measurements
         for quant in quants:
