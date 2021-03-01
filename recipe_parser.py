@@ -34,7 +34,8 @@ def parse_url(url):
     for step in instructions_ul:
         instructions.append(step.find("div",class_="paragraph").get_text().lstrip().rstrip())
 
-    print(get_ingredients(ingredients))
+    ingredients_dict = get_ingredients(ingredients)
+    printer(ingredients_dict,instructions)
 
 #takes list of ingredients with measurements. Return dictionary with ingredient and measurement
 def get_ingredients(lst):
@@ -57,19 +58,11 @@ def get_ingredients(lst):
         blob = TextBlob(ingredient)
 
         if len(blob.noun_phrases) == 0:
-            all[str(blob)] = measurement
+            all[str(blob).lstrip()] = measurement
         elif len(blob.noun_phrases) == 1:
-            all[blob.noun_phrases[0]] = measurement
+            all[blob.noun_phrases[0].lstrip()] = measurement
 
     return all
-
-def if_food(word):
-    syns = wn.synsets(str(word), pos = wn.NOUN)
-
-    for syn in syns:
-        if "food" in syn.lexname():
-            return word
-    return
 
 
 # read in the allrecipes.com url -> SAMPLE URL TO TEST: https://www.allrecipes.com/recipe/280509/stuffed-french-onion-chicken-meatballs/
@@ -78,4 +71,13 @@ def read_in_url():
 
     parse_url(recipe_url)
 
+def printer(ingredients_dict,instructions_lst):
+    print("Ingredients:")
+    for k in ingredients_dict.keys():
+        print("\t"+k+": "+ingredients_dict[k])
+    print("Instructions:")
+    for i,instruction in enumerate(instructions_lst):
+        print("\tStep " + str(i)+": "+instruction)
+
 read_in_url()
+
