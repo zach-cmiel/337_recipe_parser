@@ -129,8 +129,8 @@ def get_tools(lst, ingredients, title):
         for i in ingrsList:
             if np in i and i in noun_phrases:
                 noun_phrases.remove(i)
-    
-    return noun_phrases
+
+    return [x for x in noun_phrases if len(x) > 1]
 
 # read in the allrecipes.com url -> SAMPLE URL TO TEST: https://www.allrecipes.com/recipe/280509/stuffed-french-onion-chicken-meatballs/
 def read_in_url():
