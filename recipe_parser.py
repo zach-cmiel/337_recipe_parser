@@ -83,7 +83,7 @@ def strip_preps(np):
                 npStr += word.text + " "
     return npStr[:-1]
 
-#takes instructions, ingreditients dictionary, and title. Returns list of possible tools
+#takes instructions, ingredients dictionary, and title. Returns list of possible tools
 def get_tools(lst, ingredients, title):
     ingr = set()
     noun_phrases = set()
@@ -124,7 +124,7 @@ def get_tools(lst, ingredients, title):
                         noun_phrases.remove(np)
                     if np1 in noun_phrases: 
                         noun_phrases.remove(np1) 
-                    noun_phrases.add(' '.join(common_set))
+                    noun_phrases.add(' '.join(common_set)) ##THIS NEEDS TO BE FIXED
                 
         for i in ingrsList:
             if np in i and i in noun_phrases:
