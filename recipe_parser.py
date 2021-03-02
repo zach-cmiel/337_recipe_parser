@@ -1,14 +1,11 @@
-
 import requests
 from bs4 import BeautifulSoup
 import nltk
-nltk.download("wordnet")
-nltk.download("brown")
-from nltk.corpus import wordnet as wn
 from textblob import TextBlob
-import re
 from quantulum3 import parser
 import warnings
+nltk.download("wordnet")
+nltk.download("brown")
 warnings.simplefilter('ignore')
 
 
@@ -20,26 +17,28 @@ headers = {
     'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0'
     }
 
+
 # use BeautifulSoup and requests to inspect url HTML
 def parse_url(url):
     req = requests.get(url, headers)
     soup = BeautifulSoup(req.content, 'html.parser')
 
-    title = soup.find("h1",class_="headline heading-content").get_text().lstrip().rstrip()
+    title = soup.find("h1" , class_="headline heading-content").get_text().lstrip().rstrip()
 
-    ingredient_spans = soup.find_all('span', class_='ingredients-item-name')
+    ingredient_spans = soup.find_all('span' , class_='ingredients-item-name')
     ingredients = []
     for span in ingredient_spans:
         ingredient = span.get_text().lstrip().rstrip()
         ingredients.append(ingredient)
 
-    instructions_ul = soup.find_all("li",class_="subcontainer instructions-section-item")
+    instructions_ul = soup.find_all("li" , class_="subcontainer instructions-section-item")
     instructions = []
     for step in instructions_ul:
-        instructions.append(step.find("div",class_="paragraph").get_text().lstrip().rstrip())
+        instructions.append(step.find("div" , class_="paragraph").get_text().lstrip().rstrip())
 
     ingredients_dict = get_ingredients(ingredients)
     printer(title,ingredients_dict,instructions)
+
 
 #takes list of ingredients with measurements. Return dictionary with ingredient and measurement
 def get_ingredients(lst):
@@ -50,9 +49,11 @@ def get_ingredients(lst):
         if len(quants) == 0:
             all[ingredient] = ""
             continue
-        if len(quants) == 2 and str(quants[0].unit) == "":
+        if len(quants) == 2 and str(quants[0].unit) == "" and quants[1].value < 1:
             measurement = measurement + str(quants[0].value + quants[1].value)
             measurement = measurement + " " + str(quants[1].unit)
+        elif len(quants) == 2 and str(quants[0].unit) == "" and quants[1].value > 1:
+            measurement = str(quants[1].value * quants[0].value) + " " + str(quants[1].unit)
         else:
             measurement = str(quants[0].value) + " "+ str(quants[0].unit)
 
@@ -66,7 +67,7 @@ def get_ingredients(lst):
             all[str(blob).lstrip()] = measurement
         elif len(blob.noun_phrases) == 1:
             all[blob.noun_phrases[0].lstrip()] = measurement
-
+        
     return all
 
 
@@ -85,5 +86,6 @@ def printer(title,ingredients_dict,instructions_lst):
     for i,instruction in enumerate(instructions_lst):
         print("\tStep " + str(i+1)+": "+instruction)
 
-read_in_url()
+if __name__ == '__main__':
+    read_in_url()
 
