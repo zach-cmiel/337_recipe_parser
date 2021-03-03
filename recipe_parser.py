@@ -135,7 +135,7 @@ def get_tools(lst, ingredients, title):
                         noun_phrases.remove(np)
                     if np1 in noun_phrases: 
                         noun_phrases.remove(np1) 
-                    noun_phrases.add(' '.join(common_set)) ##THIS NEEDS TO BE FIXED
+                    noun_phrases.add(' '.join([word for word in np.split(" ") if word in common_set]))
                 
         for i in ingrsList:
             if np in i and i in noun_phrases:
