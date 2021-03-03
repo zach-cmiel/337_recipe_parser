@@ -189,7 +189,6 @@ def veg_replace(dic,instructions):
                     dic[meat_substitutes[token]] = dic[ing]
             del dic[ing]
 
-
     for i,instruction in enumerate(instructions):
         for ing in deleting_ing:
             tokens = word_tokenize(ing)

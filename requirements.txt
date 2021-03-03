@@ -21,6 +21,7 @@ decorator==4.4.2
 defusedxml==0.6.0
 docopt==0.6.2
 docutils==0.15.2
+en-core-web-lg==2.2.5
 en-core-web-sm==2.2.5
 entrypoints==0.3
 extruct==0.12.0
