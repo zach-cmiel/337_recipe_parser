@@ -7,6 +7,7 @@ import re
 import warnings
 import spacy
 from spacy.symbols import *
+from nltk.tokenize import word_tokenize
 
 nltk.download("wordnet")
 nltk.download("brown")
@@ -38,18 +39,24 @@ def parse_url(url):
     for step in instructions_ul:
         instructions.append(step.find("div" , class_="paragraph").get_text().lstrip().rstrip())
 
-    ingredients_dict = get_ingredients(ingredients)
+    ingredients_dict,ingredients_lst = get_ingredients(ingredients)
     tools_list = get_tools(instructions, ingredients_dict, title)
     printer(title,ingredients_dict,instructions,tools_list)
+    print("Veg Transformation\n")
+    veg_dic, veg_instructions = veg_replace(ingredients_dict,instructions)
+    printer(title,veg_dic,veg_instructions,tools_list)
+
 
 #takes list of ingredients with measurements. Return dictionary with ingredient and measurement
 def get_ingredients(lst):
     all = {}
+    ingredient_lst = []
     for ingredient in lst:
         quants = parser.parse(ingredient)
         measurement = ""
         if len(quants) == 0:
             all[ingredient] = ""
+            ingredient_lst.append(ingredient)
             continue
         if len(quants) == 2 and str(quants[0].unit) == "" and quants[1].value < 1:
             measurement = measurement + str(quants[0].value + quants[1].value)
@@ -67,10 +74,14 @@ def get_ingredients(lst):
 
         if len(blob.noun_phrases) == 0:
             all[str(blob).lstrip()] = measurement
+            ingredient_lst.append(str(blob).lstrip())
         elif len(blob.noun_phrases) == 1:
             all[blob.noun_phrases[0].lstrip()] = measurement
+            noun_list = str(blob.noun_phrases[0].lstrip()).split(" ")
+            for noun in noun_list:
+                ingredient_lst.append(noun)
         
-    return all
+    return all, ingredient_lst
 
 def strip_preps(np):
     badTags = ["DT", "PRP$"]
@@ -149,6 +160,47 @@ def printer(title,ingredients_dict,instructions_lst,tools):
     print("Instructions:")
     for i,instruction in enumerate(instructions_lst):
         print("\tStep " + str(i+1)+": "+instruction)
+
+
+#takes ingredients dictionary and replace meat and fish with veggies. Return new dictionary
+def veg_replace(dic,instructions):
+    meats= ['chicken','wings', 'beef', 'ground beef', 'duck', 'pork', 'ham','prosciutto', 'fish', 'sea bass', 'tilapia', 'salmon', 'halibut', 'trout','flounder',
+    'turkey', 'meat stock', 'liver', 'crab', 'shrimp', 'liver', 'bacon', 'lamb','steak']
+    meat_substitutes = {'chicken': 'eggplant', 'wings': 'eggplant', 'beef': 'tofu', 'ground beef': 'lentils',
+                        'duck': 'tempeh', 'pork': 'seitan', 'ham': 'jackfruit',
+                        'prosciutto': 'mushroom', 'fish': 'tofu', 'sea bass': 'cauliflower', 'tilapia': 'seitan',
+                        'salmon': 'eggplant', 'halibut': 'tempeh', 'trout': 'tofu', 'flounder': 'jackfruit',
+                        'turkey': 'seitan', 'meat stock': 'vegetable stock', 'liver': 'jackfruit',
+                        'crab': 'cauliflower', 'shrimp': 'tofu', 'liver': 'tempeh', 'bacon': 'fried shallots',
+                        'lamb': 'eggplant','steak':'tofu'}
+
+    deleting_ing = []
+    for ing in dic.keys():
+        tokens = word_tokenize(ing)
+        for token in tokens:
+            if token in meats:
+                deleting_ing.append(ing)
+
+    for ing in deleting_ing:
+        if ing in dic.keys():
+            tokens = word_tokenize(ing)
+            for token in tokens:
+                if token in meat_substitutes.keys():
+                    dic[meat_substitutes[token]] = dic[ing]
+            del dic[ing]
+
+
+    for i,instruction in enumerate(instructions):
+        for ing in deleting_ing:
+            tokens = word_tokenize(ing)
+            for token in tokens:
+                if token in instruction and token not in meat_substitutes.keys():
+                    instructions[i] = instruction.replace(token, "")
+                elif token in instruction:
+                    instructions[i] = instruction.replace(token,meat_substitutes[token])
+
+    return dic,instructions
+
 
 if __name__ == '__main__':
     nlp = spacy.load('en_core_web_lg')
