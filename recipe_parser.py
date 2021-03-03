@@ -10,6 +10,7 @@ from spacy.symbols import *
 from spacy.matcher import Matcher 
 from spacy.tokens import Span
 from nltk.tokenize import word_tokenize
+from PyDictionary import PyDictionary
 
 nltk.download("wordnet")
 nltk.download("brown")
@@ -85,6 +86,7 @@ def get_ingredients(lst):
         
     return all, ingredient_lst
 
+#helper function for get_tools
 def strip_preps(np):
     badTags = ["DT", "PRP$"]
     npStr = ""
@@ -102,6 +104,7 @@ def get_tools(lst, ingredients, title):
     noun_phrases = set()
     ingrsList = list(ingredients.keys())
     ingrsList = [x.replace(",", "").replace("-", " ") for x in ingrsList]
+    goodWords = ["used for", "used to", "utensil", "tool"]
     
     [ingr.add(word.lower()) for sent in ingrsList for word in sent.split(" ")]
     [ingr.add(word.lower()) for word in title.split(" ")]
@@ -121,12 +124,11 @@ def get_tools(lst, ingredients, title):
         [noun_phrases.add(strip_preps(x)) for x in nps]
     
     noun_dict = {}
-    
+        
     for key in noun_phrases:
         noun_dict[key] = set(key.split(" "))
-        
+    
     for np in noun_dict.keys():
-        
         np_set = set(np.split(" "))
         
         for np1 in noun_dict.keys():
@@ -142,9 +144,20 @@ def get_tools(lst, ingredients, title):
         for i in ingrsList:
             if np in i and i in noun_phrases:
                 noun_phrases.remove(i)
+                
+    dictionary=PyDictionary()
+    np_temp = set(noun_phrases)
+    
+    for np in np_temp:
+        word = np.split(" ")[-1]
+        meanings = dictionary.meaning(word)['Noun']
+        flag = [True for m in meanings for gw in goodWords if gw in m]
+        if flag == []:
+            noun_phrases.remove(np)
 
     return [x for x in noun_phrases if len(x) > 1]
 
+#takes instructions, returns list of verbs
 def get_methods(steps):
     verbs = set()
     badWords = ["let", "serve", "bring", "place"]
