@@ -7,6 +7,8 @@ import re
 import warnings
 import spacy
 from spacy.symbols import *
+from spacy.matcher import Matcher 
+from spacy.tokens import Span
 from nltk.tokenize import word_tokenize
 
 nltk.download("wordnet")
@@ -41,11 +43,11 @@ def parse_url(url):
 
     ingredients_dict,ingredients_lst = get_ingredients(ingredients)
     tools_list = get_tools(instructions, ingredients_dict, title)
-    printer(title,ingredients_dict,instructions,tools_list)
-    print("Veg Transformation\n")
-    veg_dic, veg_instructions = veg_replace(ingredients_dict,instructions)
-    printer(title,veg_dic,veg_instructions,tools_list)
-
+    methods_list = get_methods(instructions)
+    printer(title,ingredients_dict,instructions,tools_list,methods_list)
+    # print("Veg Transformation\n")
+    # veg_dic, veg_instructions = veg_replace(ingredients_dict,instructions)
+    # printer(title,veg_dic,veg_instructions,tools_list,methods_list)
 
 #takes list of ingredients with measurements. Return dictionary with ingredient and measurement
 def get_ingredients(lst):
@@ -143,13 +145,29 @@ def get_tools(lst, ingredients, title):
 
     return [x for x in noun_phrases if len(x) > 1]
 
+def get_methods(steps):
+    verbs = set()
+    badWords = ["let", "serve", "bring", "place"]
+    pattern=[{'TAG': 'VB'}]
+    
+    matcher = Matcher(nlp.vocab) 
+    matcher.add("verb-phrases", None, pattern)
+    
+    for step in steps:
+        doc = nlp(step)
+        matches = matcher(doc)
+        tempVerbs = [doc[start:end].text.lower() for _, start, end in matches] 
+        [verbs.add(v) for v in tempVerbs if v not in badWords]
+        
+    return verbs
+
 # read in the allrecipes.com url -> SAMPLE URL TO TEST: https://www.allrecipes.com/recipe/280509/stuffed-french-onion-chicken-meatballs/
 def read_in_url():
     recipe_url = input('Please input a url from allrecipes.com: ')
 
     parse_url(recipe_url)
 
-def printer(title,ingredients_dict,instructions_lst,tools):
+def printer(title,ingredients_dict,instructions_lst,tools,methods):
     print(title)
     print("Ingredients:")
     for k in ingredients_dict.keys():
@@ -157,6 +175,9 @@ def printer(title,ingredients_dict,instructions_lst,tools):
     print("Tools:")
     for t in tools:
         print("\t" + t)
+    print("Methods:")
+    for m in methods:
+        print("\t" + m)
     print("Instructions:")
     for i,instruction in enumerate(instructions_lst):
         print("\tStep " + str(i+1)+": "+instruction)
@@ -199,7 +220,6 @@ def veg_replace(dic,instructions):
                     instructions[i] = instruction.replace(token,meat_substitutes[token])
 
     return dic,instructions
-
 
 if __name__ == '__main__':
     nlp = spacy.load('en_core_web_lg')
