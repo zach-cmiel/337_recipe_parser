@@ -7,7 +7,7 @@ import re
 import warnings
 import spacy
 from spacy.symbols import *
-from spacy.matcher import Matcher 
+from spacy.matcher import Matcher
 from spacy.tokens import Span
 from nltk.tokenize import word_tokenize
 from PyDictionary import PyDictionary
@@ -51,6 +51,27 @@ def parse_url(url):
     # veg_dic, veg_instructions = veg_replace(ingredients_dict,instructions)
     # printer(title,veg_dic,veg_instructions,tools_list,methods_list)
 
+    # doubled_ingredients = double_half_ingredients(ingredients_dict, 2.0)
+    # halved_ingredients = double_half_ingredients(ingredients_dict, 0.5)
+
+# either doubles or halves the ingredients depending on the factor passed in (2.0 or 0.5)
+def double_half_ingredients(ingredients_dict, factor):
+    converted_ingredients = {}
+
+    for k in ingredients_dict.keys():
+        measurement = ingredients_dict[k]
+        quantities = re.findall('\d*\.?\d+', measurement)
+
+        new_measurement = measurement
+        for q in quantities:
+            new_q = float(q) * factor
+
+            new_measurement = new_measurement.replace(q, str(new_q))
+
+        converted_ingredients[k] = new_measurement
+
+    return converted_ingredients
+
 #takes list of ingredients with measurements. Return dictionary with ingredient and measurement
 def get_ingredients(lst):
     all = {}
@@ -84,7 +105,7 @@ def get_ingredients(lst):
             noun_list = str(blob.noun_phrases[0].lstrip()).split(" ")
             for noun in noun_list:
                 ingredient_lst.append(noun)
-        
+
     return all, ingredient_lst
 
 #helper function for get_tools
@@ -106,10 +127,10 @@ def get_tools(lst, ingredients, title):
     ingrsList = list(ingredients.keys())
     ingrsList = [x.replace(",", "").replace("-", " ") for x in ingrsList]
     goodWords = ["used for", "used to", "utensil", "tool"]
-    
+
     [ingr.add(word.lower()) for sent in ingrsList for word in sent.split(" ")]
     [ingr.add(word.lower()) for word in title.split(" ")]
-    
+
     for step in lst:
         doc = nlp(step)
         nps = []
@@ -121,34 +142,34 @@ def get_tools(lst, ingredients, title):
                     flag = True
                     break
             if not flag:
-                nps.append(np) 
+                nps.append(np)
         [noun_phrases.add(strip_preps(x)) for x in nps]
-    
+
     noun_dict = {}
-        
+
     for key in noun_phrases:
         noun_dict[key] = set(key.split(" "))
-    
+
     for np in noun_dict.keys():
         np_set = set(np.split(" "))
-        
+
         for np1 in noun_dict.keys():
             if np_set != noun_dict[np1]:
                 common_set = np_set & noun_dict[np1]
                 if common_set != set():
-                    if np in noun_phrases: 
+                    if np in noun_phrases:
                         noun_phrases.remove(np)
-                    if np1 in noun_phrases: 
-                        noun_phrases.remove(np1) 
+                    if np1 in noun_phrases:
+                        noun_phrases.remove(np1)
                     noun_phrases.add(' '.join([word for word in np.split(" ") if word in common_set]))
-                
+
         for i in ingrsList:
             if np in i and i in noun_phrases:
                 noun_phrases.remove(i)
-                
+
     dictionary=PyDictionary()
     np_temp = set(noun_phrases)
-    
+
     for np in np_temp:
         word = np.split(" ")[-1]
         meanings = dictionary.meaning(word)['Noun']
@@ -163,16 +184,16 @@ def get_methods(steps):
     verbs = set()
     badWords = ["let", "serve", "bring", "place", "be"]
     pattern=[{'TAG': 'VB'}]
-    
-    matcher = Matcher(nlp.vocab) 
+
+    matcher = Matcher(nlp.vocab)
     matcher.add("verb-phrases", None, pattern)
-    
+
     for step in steps:
         doc = nlp(step)
         matches = matcher(doc)
-        tempVerbs = [doc[start:end].text.lower() for _, start, end in matches] 
+        tempVerbs = [doc[start:end].text.lower() for _, start, end in matches]
         [verbs.add(v) for v in tempVerbs if v not in badWords]
-        
+
     return verbs
 
 # read in the allrecipes.com url -> SAMPLE URL TO TEST: https://www.allrecipes.com/recipe/280509/stuffed-french-onion-chicken-meatballs/
@@ -238,10 +259,10 @@ def veg_replace(dic,instructions, make_veg):
         return dic,instructions
 
     else:
-        
+
         meat_substitutes = {'eggplant',  'tofu', 'lentils',
                             'tempeh', 'seitan', 'jackfruit',
-                            'mushroom', 'tofu', 'cauliflower', 
+                            'mushroom', 'tofu', 'cauliflower',
                             'vegetable stock', 'fried shallots'}
 
         meats = {'eggplant': 'wings', 'tofu': 'beef', 'lentils': 'ground beef', 'tempeh': 'duck',
@@ -272,13 +293,13 @@ def veg_replace(dic,instructions, make_veg):
                     elif token in instruction:
                         instructions[i] = instruction.replace(token,meats[token])
         return dic,instructions
-        
+
         return dic,instructions
 
 def health_swap(dic,instructions, make_healthy):
 
     if make_healthy:
-    
+
 
         unhealthy= ['vegetable oil', 'potato', 'canola oil', 'peanut oil', 'coconut oil','corn oil', 'oil', 'whole milk', 'coconut milk', 'soy milk', 'icre cream', 'sour cream','cream cheese',    'american cheese', 'cottage cheese', 'mozzarella cheese', 'ricotta cheese', 'cream', 'flour', 'bologna', 'sausage','vegetable oil', 'torillas', 'tortilla', 'rice', 'sugar', 'penne', 'linguine',    'fettuccine',    'spaghetti',    'lasagna',    'pasta salad',    'pasta',    'white bread',    'pancakes',    'milk',    'taco shell',    'french fries',    'mashed potatoes',    'sweet potatoes' ,   'potatoes',    'potato chips',    'hash browns',    'baking soda',    'beef jerky',    'beef noodle soup',    'blue cheese',    'bullion',    'camembert cheese',    'canned anchovy',    'canned corn',    'canned tomatoes',    'capocollo',    'chicken noodle soup',    'chicken soup',    'cream of vegetable soup',    'feta cheese',    'fish sauce',    'gouda cheese',    'hot pepper sauce',    'instant soup',    'italian salami',    'ketchup',    'marinade',    'mayonnaise',    'mortadella',    'ground beef',    'olives',    'onion soup',    'oyster sauce',    'paremsan cheese',    'pepperoni',    'pickle',    'pickled eggplant',    'pickled peppers',    'prosciutto',    'queso seco',    'ranch dressing',    'relish',    'romano cheese',    'roquefort cheese',    'salad dressing',    'salami',    'salt and pepper',    'salt cod',    'salted butter',    'salted mackerel',    'lightly salted',    'salted',    'sauerkraut',    'sea salt',    'salt',    'smoked herring',    'smoked salmon',    'smoked white fish',    'soup cube',    'soup',    'soy sauce',    'steak sauce',    'stock cube',    'stock',    'table salt',    'teriyaki sauce',    'tomato soup',    'turkey bacon',    'turkey salami',    'vegetable soup',    'chocolate',    'beef',    'pork',    'breaded fish',    'fried fish',    'egg whites',    'egg white',    'whole eggs',    'eggs',    'egg',    'whole egg',    'chorizo sausage',    'croissants',    'brioches',    'butter',    'margarine',    'cheddar cheese',    'cheese',    'chilli powder']
 
