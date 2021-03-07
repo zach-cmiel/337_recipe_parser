@@ -361,6 +361,69 @@ def health_swap(dic,instructions, make_healthy):
                         instructions[i] = instruction.replace(token,healthy_substitutes[token])
         return dic,instructions
 
+def asian_cuisine_swap(dic, instructions, make_asian):
+    if make_asian:
+
+        not_asian = { 'pasta', 'spaghetti', 'parsley', 'basil', 'harissa', 'bbq sauce', 'barbecue sauce' }
+
+        asian_substitutes = { 'pasta': 'glass noodles', 'spaghetti': 'udon noodles', 'parsley': 'green onion', 'basil': 'sesame seeds', 'harissa': 'gochujang', 'bbq sauce': 'teriyaki sauce', 'barbecue sauce': 'teriyaki sauce' }
+
+        deleting_ing = []
+        for ing in dic.keys():
+            tokens = word_tokenize(ing)
+            for token in tokens:
+                if token in not_asian:
+                    deleting_ing.append(ing)
+
+        for ing in deleting_ing:
+            if ing in dic.keys():
+                tokens = word_tokenize(ing)
+                for token in tokens:
+                    if token in asian_substitutes.keys():
+                        dic[asian_substitutes[token]] = dic[ing]
+                del dic[ing]
+
+        for i,instruction in enumerate(instructions):
+            for ing in deleting_ing:
+                tokens = word_tokenize(ing)
+                for token in tokens:
+                    if token in instruction and token not in asian_substitutes.keys():
+                        instructions[i] = instruction.replace(token, "")
+                    elif token in instruction:
+                        instructions[i] = instruction.replace(token,asian_substitutes[token])
+        return dic,instructions
+
+    else:
+
+        not_asian = { 'glass noodles', 'udon noodles', 'green onion', 'sesame seeds', 'gochujang', 'teriyaki sauce' }
+
+        asian_substitutes = { 'glass noodles': 'pasta', 'udon noodles': 'spaghetti', 'green onion': 'parsley', 'sesame seeds': 'basil', 'gochujang': 'harissa', 'teriyaki sauce': 'barbecue sauce' }
+
+        deleting_ing = []
+        for ing in dic.keys():
+            tokens = word_tokenize(ing)
+            for token in tokens:
+                if token in not_asian:
+                    deleting_ing.append(ing)
+
+        for ing in deleting_ing:
+            if ing in dic.keys():
+                tokens = word_tokenize(ing)
+                for token in tokens:
+                    if token in asian_substitutes.keys():
+                        dic[asian_substitutes[token]] = dic[ing]
+                del dic[ing]
+
+        for i,instruction in enumerate(instructions):
+            for ing in deleting_ing:
+                tokens = word_tokenize(ing)
+                for token in tokens:
+                    if token in instruction and token not in asian_substitutes.keys():
+                        instructions[i] = instruction.replace(token, "")
+                    elif token in instruction:
+                        instructions[i] = instruction.replace(token,asian_substitutes[token])
+        return dic,instructions
+
 if __name__ == '__main__':
     nlp = spacy.load('en_core_web_lg')
     read_in_url()
