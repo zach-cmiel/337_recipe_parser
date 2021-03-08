@@ -42,17 +42,60 @@ def parse_url(url):
     instructions = []
     for step in instructions_ul:
         instructions.append(step.find("div" , class_="paragraph").get_text().lstrip().rstrip())
-
+    
     ingredients_dict,ingredients_lst = get_ingredients(ingredients)
     tools_list = get_tools(instructions, ingredients_dict, title)
     methods_list = get_methods(instructions)
-    printer(title,ingredients_dict,instructions,tools_list,methods_list)
-    # print("Veg Transformation\n")
-    # veg_dic, veg_instructions = veg_replace(ingredients_dict,instructions)
-    # printer(title,veg_dic,veg_instructions,tools_list,methods_list)
 
-    # doubled_ingredients = double_half_ingredients(ingredients_dict, 2.0)
-    # halved_ingredients = double_half_ingredients(ingredients_dict, 0.5)
+    print("\nOriginal Recipe\n")
+    printer(title, ingredients_dict, instructions, tools_list, methods_list)
+    print("\n")
+
+    contTransformations = True
+
+    while contTransformations:
+
+        print("Would you like to transform this recipe?")
+        print("OPTIONS: vegetarian, healthy, asian cuisine, double ingredients, halve ingredients")
+        print("If you would like to exit, enter \"exit\"")
+        print("If you would like to parse another recipe, enter \"another\"")
+
+        transformation = input('\nTransformation: ')
+        print("\n")
+
+        if transformation in ['asian cuisine', 'asian']:
+            asian_dic, asian_instructions = asian_cuisine_swap(ingredients_dict, instructions, True)
+            print("Asian Cuisine Transformation\n")
+            printer(title, asian_dic, asian_instructions, tools_list, methods_list)
+            print("\n")
+        elif transformation == 'vegetarian':
+            veg_dic, veg_instructions = veg_replace(ingredients_dict, instructions, True)
+            print("Vegetarian Transformation\n")
+            printer(title, veg_dic, veg_instructions, tools_list, methods_list)
+            print("\n")
+        elif transformation == 'healthy':
+            healthy_dict, healthy_instructions = health_swap(ingredients_dict, instructions, True)
+            print("Healthy Transformation\n")
+            printer(title, healthy_dict, healthy_instructions, tools_list, methods_list)
+            print("\n")
+        elif transformation in ['double ingredients', 'double']:
+            doubled_ingredients = double_half_ingredients(ingredients_dict, 2.0)
+            print("Double Ingredients Transformation\n")
+            printer(title, doubled_ingredients, instructions, tools_list, methods_list)
+            print("\n")
+        elif transformation in ['halve ingredients', 'halve']:
+            halved_ingredients = double_half_ingredients(ingredients_dict, 0.5)
+            print("Halved Ingredients Transformation\n")
+            printer(title, halved_ingredients, instructions, tools_list, methods_list)
+            print("\n")
+        elif transformation == 'exit':
+            return
+        elif transformation == 'another':
+            read_in_url()
+            contTransformations = False
+        else:
+            print("Invalid input, please try again.")
+
 
 # either doubles or halves the ingredients depending on the factor passed in (2.0 or 0.5)
 def double_half_ingredients(ingredients_dict, factor):
@@ -172,9 +215,16 @@ def get_tools(lst, ingredients, title):
 
     for np in np_temp:
         word = np.split(" ")[-1]
-        meanings = dictionary.meaning(word)['Noun']
-        flag = [True for m in meanings for gw in goodWords if gw in m]
-        if flag == []:
+        meaningsDict = dictionary.meaning(word)
+        if meaningsDict:
+            if 'Noun' in meaningsDict.keys():
+                meaningsNoun = meaningsDict['Noun']
+                flag = [True for m in meaningsNoun for gw in goodWords if gw in m]
+                if flag == []:
+                    noun_phrases.remove(np)
+            else:
+                noun_phrases.remove(np)
+        else:
             noun_phrases.remove(np)
 
     return [x for x in noun_phrases if len(x) > 1]
@@ -182,7 +232,7 @@ def get_tools(lst, ingredients, title):
 #takes instructions, returns list of verbs
 def get_methods(steps):
     verbs = set()
-    badWords = ["let", "serve", "bring", "place", "be"]
+    badWords = ["let", "serve", "bring", "place", "be", "make", "use", "read", "turn", "add", "remove", "move", "create"]
     pattern=[{'TAG': 'VB'}]
 
     matcher = Matcher(nlp.vocab)
@@ -299,7 +349,6 @@ def veg_replace(dic,instructions, make_veg):
 def health_swap(dic,instructions, make_healthy):
 
     if make_healthy:
-
 
         unhealthy= ['vegetable oil', 'potato', 'canola oil', 'peanut oil', 'coconut oil','corn oil', 'oil', 'whole milk', 'coconut milk', 'soy milk', 'icre cream', 'sour cream','cream cheese',    'american cheese', 'cottage cheese', 'mozzarella cheese', 'ricotta cheese', 'cream', 'flour', 'bologna', 'sausage','vegetable oil', 'torillas', 'tortilla', 'rice', 'sugar', 'penne', 'linguine',    'fettuccine',    'spaghetti',    'lasagna',    'pasta salad',    'pasta',    'white bread',    'pancakes',    'milk',    'taco shell',    'french fries',    'mashed potatoes',    'sweet potatoes' ,   'potatoes',    'potato chips',    'hash browns',    'baking soda',    'beef jerky',    'beef noodle soup',    'blue cheese',    'bullion',    'camembert cheese',    'canned anchovy',    'canned corn',    'canned tomatoes',    'capocollo',    'chicken noodle soup',    'chicken soup',    'cream of vegetable soup',    'feta cheese',    'fish sauce',    'gouda cheese',    'hot pepper sauce',    'instant soup',    'italian salami',    'ketchup',    'marinade',    'mayonnaise',    'mortadella',    'ground beef',    'olives',    'onion soup',    'oyster sauce',    'paremsan cheese',    'pepperoni',    'pickle',    'pickled eggplant',    'pickled peppers',    'prosciutto',    'queso seco',    'ranch dressing',    'relish',    'romano cheese',    'roquefort cheese',    'salad dressing',    'salami',    'salt and pepper',    'salt cod',    'salted butter',    'salted mackerel',    'lightly salted',    'salted',    'sauerkraut',    'sea salt',    'salt',    'smoked herring',    'smoked salmon',    'smoked white fish',    'soup cube',    'soup',    'soy sauce',    'steak sauce',    'stock cube',    'stock',    'table salt',    'teriyaki sauce',    'tomato soup',    'turkey bacon',    'turkey salami',    'vegetable soup',    'chocolate',    'beef',    'pork',    'breaded fish',    'fried fish',    'egg whites',    'egg white',    'whole eggs',    'eggs',    'egg',    'whole egg',    'chorizo sausage',    'croissants',    'brioches',    'butter',    'margarine',    'cheddar cheese',    'cheese',    'chilli powder']
 
