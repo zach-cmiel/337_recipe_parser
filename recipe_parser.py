@@ -11,6 +11,7 @@ from spacy.matcher import Matcher
 from spacy.tokens import Span
 from nltk.tokenize import word_tokenize
 from PyDictionary import PyDictionary
+import copy
 
 nltk.download('punkt')
 nltk.download("wordnet")
@@ -53,15 +54,16 @@ def parse_url(url):
 
     contTransformations = True
 
-    original_ingredients = ingredients_dict
-    original_instructions = instructions
+    original_ingredients = copy.deepcopy(ingredients_dict)
+    original_instructions = copy.deepcopy(instructions)
 
     while contTransformations:
 
         print("Would you like to transform this recipe?")
         print("OPTIONS: vegetarian, non-vegetarian, healthy, unhealthy, asian cuisine, double ingredients, halve ingredients")
-        print("If you would like to exit, enter \"exit\"")
-        print("If you would like to parse another recipe, enter \"another\"")
+        print("If you would like to reset the current recipe, type \"original\"")
+        print("If you would like to parse another recipe, type \"another\"")
+        print("If you would like to exit, type \"exit\"")
 
         transformation = input('\nTransformation: ')
         print("\n")
@@ -99,6 +101,12 @@ def parse_url(url):
         elif transformation in ['halve ingredients', 'halve']:
             ingredients_dict = double_half_ingredients(ingredients_dict, 0.5)
             print("Halved Ingredients Transformation\n")
+            printer(title, ingredients_dict, instructions, tools_list, methods_list)
+            print("\n")
+        elif transformation == 'original':
+            ingredients_dict = original_ingredients
+            instructions = original_instructions
+            print("\nOriginal Recipe\n")
             printer(title, ingredients_dict, instructions, tools_list, methods_list)
             print("\n")
         elif transformation == 'exit':
