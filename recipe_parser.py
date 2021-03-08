@@ -293,12 +293,16 @@ def veg_replace(dic,instructions, make_veg):
                             'crab': 'cauliflower', 'shrimp': 'tofu', 'liver': 'tempeh', 'bacon': 'fried shallots',
                             'lamb': 'eggplant','steak':'tofu'}
 
+        substitutions = 0
+
         deleting_ing = []
         for ing in dic.keys():
             tokens = word_tokenize(ing)
             for token in tokens:
                 if token in meats:
                     deleting_ing.append(ing)
+                    substitutions += 1
+            
 
         for ing in deleting_ing:
             if ing in dic.keys():
@@ -316,6 +320,11 @@ def veg_replace(dic,instructions, make_veg):
                         instructions[i] = instruction.replace(token, "")
                     elif token in instruction:
                         instructions[i] = instruction.replace(token,meat_substitutes[token])
+        
+        if substitutions == 0:
+            dic['kale'] = '2 leaves'
+            instructions.append("Top with kale.")
+
         return dic,instructions
 
     else:
@@ -329,12 +338,14 @@ def veg_replace(dic,instructions, make_veg):
                             'seitan': 'pork', 'jackfruit': 'ham', 'mushroom': 'prosciutto',
                             'tofu': 'fish', 'cauliflower': 'shrimp', 'vegetable stock': 'beef stock', 'fried shallots': 'bacon'}
 
+        substitutions = 0
         deleting_ing = []
         for ing in dic.keys():
             tokens = word_tokenize(ing)
             for token in tokens:
                 if token in meat_substitutes:
                     deleting_ing.append(ing)
+                    substitutions += 1
 
         for ing in deleting_ing:
             if ing in dic.keys():
@@ -352,9 +363,15 @@ def veg_replace(dic,instructions, make_veg):
                         instructions[i] = instruction.replace(token, "")
                     elif token in instruction:
                         instructions[i] = instruction.replace(token,meats[token])
-        return dic,instructions
+
+        
+        if substitutions == 0:
+            dic['bacon bits'] = '1 teaspoon'
+            instructions.append("Sprinkle bacon bits on dish.")
 
         return dic,instructions
+
+
 
 def health_swap(dic,instructions, make_healthy):
 
@@ -362,14 +379,16 @@ def health_swap(dic,instructions, make_healthy):
 
         unhealthy= ['vegetable oil', 'potato', 'canola oil', 'peanut oil', 'coconut oil','corn oil', 'whole milk', 'coconut milk', 'soy milk', 'ice cream', 'sour cream','cream cheese',    'american cheese', 'cottage cheese', 'mozzarella cheese', 'ricotta cheese', 'cream',  'all-purpose flour', 'bologna', 'sausage','vegetable oil', 'torillas', 'tortilla', 'rice', 'sugar', 'penne', 'linguine',    'fettuccine',    'spaghetti',    'lasagna',    'pasta salad',    'pasta',    'white bread',    'pancakes',    'milk',    'taco shell',    'french fries',    'mashed potatoes',    'sweet potatoes' ,   'potatoes',    'potato chips',    'hash browns',    'baking soda',    'beef jerky',    'beef noodle soup',    'blue cheese',    'bullion',    'camembert cheese',    'canned anchovy',    'canned corn',    'canned tomatoes',    'capocollo',    'chicken noodle soup',  'chicken soup',    'cream of vegetable soup',    'feta cheese',    'fish sauce',    'gouda cheese',    'hot pepper sauce',    'instant soup',    'italian salami',    'ketchup',    'marinade',    'mayonnaise',    'mortadella',    'ground beef',    'olives',    'onion soup',    'oyster sauce',    'paremsan cheese',    'pepperoni',    'pickle',    'pickled eggplant',    'pickled peppers',    'prosciutto',    'queso seco',    'ranch dressing',    'relish',    'romano cheese',    'roquefort cheese',    'salad dressing',    'salami',    'salt and pepper',    'salt cod',    'salted butter',    'salted mackerel',    'lightly salted',    'salted',    'sauerkraut',    'sea salt',    'salt',    'smoked herring',    'smoked salmon',    'smoked white fish',    'soup cube',    'soup',    'soy sauce',    'steak sauce',    'stock cube',    'stock',    'table salt',    'teriyaki sauce',    'tomato soup',    'turkey bacon',    'turkey salami',    'vegetable soup',    'chocolate',    'beef',    'pork',    'breaded fish',    'fried fish',    'egg whites',    'egg white',    'whole eggs',    'eggs',    'egg',    'whole egg',    'chorizo sausage',    'croissants',    'brioches',    'butter',    'margarine',    'cheddar cheese',    'cheese',    'chilli powder']
 
-        healthy_substitutes = { 'vegetable oil': 'olive oil',    'potato': 'zucchini',  'all-purpose flour': 'whole wheat all-purpose flour',   'canola oil': 'olive oil',     'peanut oil': 'olive oil',     'coconut oil': 'olive oil',     'corn oil': 'olive oil',     'sunflower oil': 'olive oil',     'sesame oil' : 'olive oil',     'coconut oil' : 'olive oil', 'all-purpose flour': 'whole wheat all-purpose flour'  ,   'whole milk': 'low-fat milk',     'coconut milk' : 'almond milk',     'soy milk' : 'almond milk',     'ice cream': 'low-fat frozen yoghurt',     'sour cream': 'plain low-fat yoghurt',    'cream cheese': 'fat-free cream cheese',     'american cheese': 'fat-free cheese',    'cottage cheese': 'low-fat cottage cheese',    'mozzarella cheese': 'part-skim milk mozzarella cheese',    'ricotta cheese': 'part-skim milk ricotta cheese',    'cream': 'low-fat milk',  'bologna': 'low-fat bologna',    'sausage': 'lean ham',    'vegetable oil': 'coconut oil',    'tortillas': 'lettuce leaves',    'tortilla': 'lettuce leaves',    'rice': 'cauliflower rice',    'sugar': 'imitation sugar',    'penne': 'whole wheat penne',    'linguine': 'whole wheat linguine',    'fettuccine': 'whole wheat fettuccine',    'spaghetti': 'spaghetti squash',    'lasagna': 'vegetable lasagna',    'pasta salad': 'mixed vegetables',    'pasta': 'veggie noodles',    'white bread': 'whole wheat bread',    'pancakes': 'whole wheat pancakes',    'milk': 'almond milk',    'taco shell': 'lettuce wrap',    'french fries': 'butternut squash fries',    'mashed potatoes': 'mashed cauliflower',    'sweet potatoes': 'zucchini',    'potatoes': 'zucchini',    'potato chips': 'kale chips',    'hash browns': 'squash',    'baking soda': 'sodium-free baking soda',    'beef noodle soup': 'mushroom broth',    'blue cheese': 'part-skim milk mozzarella cheese',    'bullion': 'mushroom broth',    'camembert cheese': 'part-skim milk mozzarella cheese',    'canned anchovy': 'low-sodium sardines',    'canned corn': 'fresh corn',    'canned tomatoes': 'fresh tomatoes',    'capocollo': 'low-sodium ham',    'chicken noodle soup': 'mushroom broth',    'chicken soup': 'mushroom broth',    'cream of vegetable soup': 'mushroom broth',      'feta cheese': 'part-skim milk mozzarella cheese',    'fish sauce': 'vinegar',    'gouda cheese': 'part-skim milk mozzarella cheese',    'hot pepper sauce': 'red pepper flakes',    'instant soup': 'mushroom broth',    'italian salami': 'low-sodium ham',    'ketchup': 'low-sodium ketchup',    'marinade': 'flavored vinegar',    'mayonnaise': 'yogurt',    'mortadella': 'low-sodium ham',    'ground beef': 'extra-lean ground beef',    'olives': 'baked grapes',    'onion soup': 'mushroom broth',    'oyster sauce': 'vinegar',    'paremsan cheese': 'part-skim milk mozzarella cheese',    'pepperoni': 'low-sodium ham',    'pickle': 'cucumber',    'pickled eggplant': 'eggplant',    'pickled peppers': 'fresh chiles',    'prosciutto': 'low-sodium ham',    'queso seco': 'part-skim milk mozzarella cheese',    'ranch dressing': 'balsamic vinegar',    'relish': 'low-sodium sweet relish',    'romano cheese': 'part-skim milk mozzarella cheese',    'roquefort cheese': 'part-skim milk mozzarella cheese',    'salad dressing': 'olive oil',    'salami': 'low-sodium ham',    'salt and pepper': 'pepper',    'salt cod': 'fresh cod',    'salted butter': 'unsalted butter',    'salted mackerel': 'fresh mackerel',    'lightly salted': '',    'salted': '',    'sauerkraut': 'chopped cabbage',    'sea salt': 'sesame oil',    'salt': 'low-sodium salt substitute',    'smoked herring': 'seared herring',    'smoked salmon': 'fresh salmon',    'smoked white fish': 'seared white fish',    'soup cube': 'mushroom broth',    'soup': 'vegetable puree',    'soy sauce': 'low-sodium soy sauce',    'steak sauce': 'low-sodium steak sauce',    'stock cube': 'mushroom broth',    'stock': 'mushroom broth',    'table salt': 'sesame oil',    'teriyaki sauce': 'vinegar',    'tomato soup': 'mushroom broth',    'turkey bacon': 'fresh turkey strips',    'turkey salami': 'low-sodium ham',    'vegetable soup': 'mushroom broth',    'chocolate': 'carob',    'beef': 'beef(trimmed of external fat)',    'pork': 'lean smoked ham',    'breaded fish': 'unbreaded shellfish',    'fried fish': 'unbreaded shellfish',    'egg whites':'egg whites',    'egg white':'egg white',    'whole eggs': 'egg whites',    'eggs': 'egg whites',    'egg': 'egg whites',    'whole egg': 'egg whites',    'chorizo sausage': 'turkey sausage',    'croissants': 'hard french rolls',    'brioches': 'hard french rolls',    'butter': 'whipped butter',    'margarine': 'diet margarine',    'cheddar cheese': 'fat-free cheese',    'cheese': 'low-fat cheese',    'chilli powder': 'green chilli powder'}
+        healthy_substitutes = {   'potato': 'zucchini',   'canola oil': 'olive oil',     'peanut oil': 'olive oil',     'corn oil': 'olive oil',     'sunflower oil': 'olive oil',     'sesame oil' : 'olive oil',     'coconut oil' : 'olive oil', 'all-purpose flour': 'whole wheat all-purpose flour'  ,   'whole milk': 'low-fat milk',     'coconut milk' : 'almond milk',     'soy milk' : 'almond milk',     'ice cream': 'low-fat frozen yoghurt',     'sour cream': 'plain low-fat yoghurt',    'cream cheese': 'fat-free cream cheese',     'american cheese': 'fat-free cheese',    'cottage cheese': 'low-fat cottage cheese',    'mozzarella cheese': 'part-skim milk mozzarella cheese',    'ricotta cheese': 'part-skim milk ricotta cheese',    'cream': 'low-fat milk',  'bologna': 'low-fat bologna',    'sausage': 'lean ham',    'vegetable oil': 'coconut oil',    'tortillas': 'lettuce leaves',    'tortilla': 'lettuce leaves',    'rice': 'cauliflower rice',    'sugar': 'imitation sugar',    'penne': 'whole wheat penne',    'linguine': 'whole wheat linguine',    'fettuccine': 'whole wheat fettuccine',    'spaghetti': 'spaghetti squash',    'lasagna': 'vegetable lasagna',    'pasta salad': 'mixed vegetables',    'pasta': 'veggie noodles',    'white bread': 'whole wheat bread',    'pancakes': 'whole wheat pancakes',    'milk': 'almond milk',    'taco shell': 'lettuce wrap',    'french fries': 'butternut squash fries',    'mashed potatoes': 'mashed cauliflower',    'sweet potatoes': 'zucchini',    'potatoes': 'zucchini',    'potato chips': 'kale chips',    'hash browns': 'squash',    'baking soda': 'sodium-free baking soda',    'beef noodle soup': 'mushroom broth',    'blue cheese': 'part-skim milk mozzarella cheese',    'bullion': 'mushroom broth',    'camembert cheese': 'part-skim milk mozzarella cheese',    'canned anchovy': 'low-sodium sardines',    'canned corn': 'fresh corn',    'canned tomatoes': 'fresh tomatoes',    'capocollo': 'low-sodium ham',    'chicken noodle soup': 'mushroom broth',    'chicken soup': 'mushroom broth',    'cream of vegetable soup': 'mushroom broth',      'feta cheese': 'part-skim milk mozzarella cheese',    'fish sauce': 'vinegar',    'gouda cheese': 'part-skim milk mozzarella cheese',    'hot pepper sauce': 'red pepper flakes',    'instant soup': 'mushroom broth',    'italian salami': 'low-sodium ham',    'ketchup': 'low-sodium ketchup',    'marinade': 'flavored vinegar',    'mayonnaise': 'yogurt',    'mortadella': 'low-sodium ham',    'ground beef': 'extra-lean ground beef',    'olives': 'baked grapes',    'onion soup': 'mushroom broth',    'oyster sauce': 'vinegar',    'paremsan cheese': 'part-skim milk mozzarella cheese',    'pepperoni': 'low-sodium ham',    'pickle': 'cucumber',    'pickled eggplant': 'eggplant',    'pickled peppers': 'fresh chiles',    'prosciutto': 'low-sodium ham',    'queso seco': 'part-skim milk mozzarella cheese',    'ranch dressing': 'balsamic vinegar',    'relish': 'low-sodium sweet relish',    'romano cheese': 'part-skim milk mozzarella cheese',    'roquefort cheese': 'part-skim milk mozzarella cheese',    'salad dressing': 'olive oil',    'salami': 'low-sodium ham',    'salt and pepper': 'pepper',    'salt cod': 'fresh cod',    'salted butter': 'unsalted butter',    'salted mackerel': 'fresh mackerel',    'lightly salted': '',    'salted': '',    'sauerkraut': 'chopped cabbage',    'sea salt': 'sesame oil',    'salt': 'low-sodium salt substitute',    'smoked herring': 'seared herring',    'smoked salmon': 'fresh salmon',    'smoked white fish': 'seared white fish',    'soup cube': 'mushroom broth',    'soup': 'vegetable puree',    'soy sauce': 'low-sodium soy sauce',    'steak sauce': 'low-sodium steak sauce',    'stock cube': 'mushroom broth',    'stock': 'mushroom broth',    'table salt': 'sesame oil',    'teriyaki sauce': 'vinegar',    'tomato soup': 'mushroom broth',    'turkey bacon': 'fresh turkey strips',    'turkey salami': 'low-sodium ham',    'vegetable soup': 'mushroom broth',    'chocolate': 'carob',    'beef': 'beef(trimmed of external fat)',    'pork': 'lean smoked ham',    'breaded fish': 'unbreaded shellfish',    'fried fish': 'unbreaded shellfish',    'egg whites':'egg whites',    'egg white':'egg white',    'whole eggs': 'egg whites',    'eggs': 'egg whites',    'egg': 'egg whites',    'whole egg': 'egg whites',    'chorizo sausage': 'turkey sausage',    'croissants': 'hard french rolls',    'brioches': 'hard french rolls',    'butter': 'whipped butter',    'margarine': 'diet margarine',    'cheddar cheese': 'fat-free cheese',    'cheese': 'low-fat cheese',    'chilli powder': 'green chilli powder'}
 
+        substitutions = 0
         deleting_ing = []
         for ing in dic.keys():
             tokens = word_tokenize(ing)
             for token in tokens:
                 if token in unhealthy:
                     deleting_ing.append(ing)
+                    substitutions += 1
 
         for ing in deleting_ing:
             if ing in dic.keys():
@@ -387,20 +406,27 @@ def health_swap(dic,instructions, make_healthy):
                         instructions[i] = instruction.replace(token, "")
                     elif token in instruction:
                         instructions[i] = instruction.replace(token,healthy_substitutes[token])
+        
+        if substitutions == 0:
+            dic['quinoa'] = '4 cups'
+            instructions.append("Serve with quinoa.")
+        
         return dic,instructions
 
     else:
 
         healthy = { 'olive oil',  'zucchini',   'low-fat milk',     'almond milk',   'low-fat frozen yoghurt', 'fat-free cream cheese',     'fat-free cheese',    'low-fat cottage cheese',  'part-skim milk mozzarella cheese',     'part-skim milk ricotta cheese',  'low-fat milk',    'almond flour',   'low-fat bologna',   'lean ham',   'coconut oil',    'lettuce leaves',    'lettuce leaf',    'cauliflower rice',    'imitation sugar',    'whole wheat penne',    'whole wheat linguine',    'whole wheat fettuccine',     'spaghetti squash',   'vegetable lasagna',    'mixed vegetables',   'veggie noodles',    'whole wheat bread',  'whole wheat pancakes',    'almond milk',     'lettuce wrap',   'butternut squash fries',     'mashed cauliflower',     'kale chips',    'squash',    'sodium-free baking soda',     'mushroom broth',     'part-skim milk mozzarella cheese',   'low-sodium sardines',    'fresh corn',    'fresh tomatoes',   'low-sodium ham',    'low-sodium ketchup',     'cucumber',     'eggplant',    'fresh chiles',    'balsamic vinegar',  'low-sodium sweet relish',        'lightly salted' , 'vegetable puree',  'low-sodium soy sauce',   'low-sodium steak sauce', 'egg whites',    'egg white'   , 'turkey sausage',  'margarine',  'fat-free cheese',   'low-fat cheese'}
 
-        unhealthy_substitutes = { 'olive oil': 'canola oil',  'zucchini': 'potato',   'low-fat milk':'whole milk',     'almond milk': 'whole milk',      'frozen yogurt': 'ice cream', 'fat-free cream cheese': 'cream cheese',     'fat-free cheese': 'cheese',    'low-fat cottage cheese': 'cottage cheese',  'part-skim milk mozzarella cheese': 'mozzarella cheese',     'part-skim milk ricotta cheese': 'ricotta cheese',  'low-fat milk': 'whole milk',    'almond flour': 'flour',   'low-fat bologna': 'bologna',   'lean ham': 'ham',   'coconut oil': 'canoloa oil',    'lettuce leaves': 'tortillas',    'lettuce leaf': 'tortilla',    'cauliflower rice': 'rice',    'imitation sugar': 'sugar',    'whole wheat penne': 'penne',    'whole wheat linguine': 'linguine',    'whole wheat fettuccine': 'fettuccine',     'spaghetti squash': 'spaghetti',   'vegetable lasagna': 'lasagna',    'mixed vegetables': 'hash browns',   'veggie noodles': 'noodles',    'whole wheat bread': 'bread',  'whole wheat pancakes': 'pancakes',     'lettuce wrap': 'taco',   'butternut squash fries': 'french fries',     'mashed cauliflower': 'mashed potatoes',     'kale chips':'chips',    'squash':'potato',    'sodium-free baking soda': 'baking soda',     'mushroom broth': 'beef broth',   'low-sodium sardines': 'sardines',    'fresh corn': 'canned corn',    'fresh tomatoes': 'canned tomatoes',   'low-sodium ham': 'ham',    'low-sodium ketchup': 'ketchup',     'cucumber': 'pickle',     'eggplant': 'potato',    'fresh chiles':'fries',    'balsamic vinegar':'ranch',  'low-sodium sweet relish':'relish',        'lightly salted':'salted',    'vegetable puree': 'fries',  'low-sodium soy sauce': 'soy sauce',   'low-sodium steak sauce': 'steak sauce', 'egg whites': 'eggs',    'egg white': 'egg'   , 'turkey sausage': 'bacon',  'margarine': 'butter', 'fat-free cheese':'cheese',   'low-fat cheese':'cheese'}
+        unhealthy_substitutes = { 'olive oil': 'canola oil',  'zucchini': 'potato',     'almond milk': 'whole milk',      'frozen yogurt': 'ice cream', 'fat-free cream cheese': 'cream cheese',      'low-fat cottage cheese': 'cottage cheese',  'part-skim milk mozzarella cheese': 'mozzarella cheese',     'part-skim milk ricotta cheese': 'ricotta cheese',  'low-fat milk': 'whole milk',    'almond flour': 'flour',   'low-fat bologna': 'bologna',   'lean ham': 'ham',   'coconut oil': 'canoloa oil',    'lettuce leaves': 'tortillas',    'lettuce leaf': 'tortilla',    'cauliflower rice': 'rice',    'imitation sugar': 'sugar',    'whole wheat penne': 'penne',    'whole wheat linguine': 'linguine',    'whole wheat fettuccine': 'fettuccine',     'spaghetti squash': 'spaghetti',   'vegetable lasagna': 'lasagna',    'mixed vegetables': 'hash browns',   'veggie noodles': 'noodles',    'whole wheat bread': 'bread',  'whole wheat pancakes': 'pancakes',     'lettuce wrap': 'taco',   'butternut squash fries': 'french fries',     'mashed cauliflower': 'mashed potatoes',     'kale chips':'chips',    'squash':'potato',    'sodium-free baking soda': 'baking soda',     'mushroom broth': 'beef broth',   'low-sodium sardines': 'sardines',    'fresh corn': 'canned corn',    'fresh tomatoes': 'canned tomatoes',   'low-sodium ham': 'ham',    'low-sodium ketchup': 'ketchup',     'cucumber': 'pickle',     'eggplant': 'potato',    'fresh chiles':'fries',    'balsamic vinegar':'ranch',  'low-sodium sweet relish':'relish',        'lightly salted':'salted',    'vegetable puree': 'fries',  'low-sodium soy sauce': 'soy sauce',   'low-sodium steak sauce': 'steak sauce', 'egg whites': 'eggs',    'egg white': 'egg'   , 'turkey sausage': 'bacon',  'margarine': 'butter', 'fat-free cheese':'cheese',   'low-fat cheese':'cheese'}
 
+        substitutions = 0
         deleting_ing = []
         for ing in dic.keys():
             tokens = word_tokenize(ing)
             for token in tokens:
                 if token in healthy:
                     deleting_ing.append(ing)
+                    substitutions += 1
 
         for ing in deleting_ing:
             if ing in dic.keys():
@@ -418,6 +444,11 @@ def health_swap(dic,instructions, make_healthy):
                         instructions[i] = instruction.replace(token, "")
                     elif token in instruction:
                         instructions[i] = instruction.replace(token,unhealthy_substitutes[token])
+        
+        if substitutions == 0:
+            dic['melted chocolate'] = '1 cup'
+            instructions.append("Coat in chocolate.")
+
         return dic,instructions
 
 def asian_cuisine_swap(dic, instructions, make_asian):
