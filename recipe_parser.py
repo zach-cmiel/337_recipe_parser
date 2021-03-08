@@ -53,6 +53,9 @@ def parse_url(url):
 
     contTransformations = True
 
+    original_ingredients = ingredients_dict
+    original_instructions = instructions
+
     while contTransformations:
 
         print("Would you like to transform this recipe?")
@@ -64,39 +67,39 @@ def parse_url(url):
         print("\n")
 
         if transformation in ['asian cuisine', 'asian']:
-            asian_dic, asian_instructions = asian_cuisine_swap(ingredients_dict, instructions, True)
+            ingredients_dict, instructions = asian_cuisine_swap(ingredients_dict, instructions, True)
             print("Asian Cuisine Transformation\n")
-            printer(title, asian_dic, asian_instructions, tools_list, methods_list)
+            printer(title, ingredients_dict, instructions, tools_list, methods_list)
             print("\n")
         elif transformation == 'vegetarian':
-            veg_dic, veg_instructions = veg_replace(ingredients_dict, instructions, True)
+            ingredients_dict, instructions = veg_replace(ingredients_dict, instructions, True)
             print("Vegetarian Transformation\n")
-            printer(title, veg_dic, veg_instructions, tools_list, methods_list)
+            printer(title, ingredients_dict, instructions, tools_list, methods_list)
             print("\n")
         elif transformation == 'non-vegetarian':
-            veg_dic, veg_instructions = veg_replace(ingredients_dict, instructions, False)
+            ingredients_dict, instructions = veg_replace(ingredients_dict, instructions, False)
             print("Non-Vegetarian Transformation\n")
-            printer(title, veg_dic, veg_instructions, tools_list, methods_list)
+            printer(title, ingredients_dict, instructions, tools_list, methods_list)
             print("\n")
         elif transformation == 'healthy':
-            healthy_dict, healthy_instructions = health_swap(ingredients_dict, instructions, True)
+            ingredients_dict, instructions = health_swap(ingredients_dict, instructions, True)
             print("Healthy Transformation\n")
-            printer(title, healthy_dict, healthy_instructions, tools_list, methods_list)
+            printer(title, ingredients_dict, instructions, tools_list, methods_list)
             print("\n")
         elif transformation == 'unhealthy':
-            healthy_dict, healthy_instructions = health_swap(ingredients_dict, instructions, False)
+            ingredients_dict, instructions = health_swap(ingredients_dict, instructions, False)
             print("Unhealthy Transformation\n")
-            printer(title, healthy_dict, healthy_instructions, tools_list, methods_list)
+            printer(title, ingredients_dict, instructions, tools_list, methods_list)
             print("\n")
         elif transformation in ['double ingredients', 'double']:
-            doubled_ingredients = double_half_ingredients(ingredients_dict, 2.0)
+            ingredients_dict = double_half_ingredients(ingredients_dict, 2.0)
             print("Double Ingredients Transformation\n")
-            printer(title, doubled_ingredients, instructions, tools_list, methods_list)
+            printer(title, ingredients_dict, instructions, tools_list, methods_list)
             print("\n")
         elif transformation in ['halve ingredients', 'halve']:
-            halved_ingredients = double_half_ingredients(ingredients_dict, 0.5)
+            ingredients_dict = double_half_ingredients(ingredients_dict, 0.5)
             print("Halved Ingredients Transformation\n")
-            printer(title, halved_ingredients, instructions, tools_list, methods_list)
+            printer(title, ingredients_dict, instructions, tools_list, methods_list)
             print("\n")
         elif transformation == 'exit':
             return
@@ -242,7 +245,7 @@ def get_tools(lst, ingredients, title):
 #takes instructions, returns list of verbs
 def get_methods(steps):
     verbs = set()
-    badWords = ["let", "serve", "bring", "place", "be", "make", "use", "read", "turn", "add", "remove", "move", "create"]
+    badWords = ["let", "serve", "bring", "place", "be", "make", "use", "read", "turn", "add", "remove", "move", "create", "begin", "allow"]
     pattern=[{'TAG': 'VB'}]
 
     matcher = Matcher(nlp.vocab)
