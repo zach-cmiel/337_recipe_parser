@@ -333,7 +333,7 @@ def veg_replace(dic,instructions, make_veg):
                         instructions[i] = instruction.replace(token,meat_substitutes[token])
         
         if substitutions == 0:
-            dic['kale'] = '2 leaves'
+            dic['kale'] = '2 pieces'
             instructions.append("Top with kale.")
 
         return dic,instructions
