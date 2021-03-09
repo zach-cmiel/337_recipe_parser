@@ -5,6 +5,8 @@ Github link: https://github.com/zach-cmiel/337_recipe_parser
 
 The Python file to run is recipe_parser.py
 
+Run with Python 3.7
+
 The packages required for this project can be loaded from the requirements.txt
 
 VERY VERY IMPORTANT: you must download the Spacy model using the following command:
