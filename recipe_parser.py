@@ -115,8 +115,7 @@ def parse_url(url):
             read_in_url()
             contTransformations = False
         else:
-            print("Invalid input, please try again.")
-
+            print("Invalid input, please try again.\n")
 
 # either doubles or halves the ingredients depending on the factor passed in (2.0 or 0.5)
 def double_half_ingredients(ingredients_dict, factor):
@@ -252,8 +251,8 @@ def get_tools(lst, ingredients, title):
 
 #takes instructions, returns list of verbs
 def get_methods(steps):
-    verbs = set()
-    badWords = ["let", "serve", "bring", "place", "be", "make", "use", "read", "turn", "add", "remove", "move", "create", "begin", "allow"]
+    verbs = {}
+    badWords = ["let", "serve", "bring", "place", "be", "make", "use", "read", "turn", "add", "remove", "move", "create", "begin", "allow", "continue"]
     pattern=[{'TAG': 'VB'}]
 
     matcher = Matcher(nlp.vocab)
@@ -263,8 +262,17 @@ def get_methods(steps):
         doc = nlp(step)
         matches = matcher(doc)
         tempVerbs = [doc[start:end].text.lower() for _, start, end in matches]
-        [verbs.add(v) for v in tempVerbs if v not in badWords]
+        for v in tempVerbs:
+            if v not in badWords:
+                if v not in verbs.keys():
+                    verbs[v] = 1
+                else:
+                    verbs[v] += 1
 
+    verbs = dict(sorted(verbs.items(), key=lambda item: item[1], reverse=True))
+    verbs = list(verbs.keys())
+    verbs[0] += " (primary)"
+    
     return verbs
 
 # read in the allrecipes.com url -> SAMPLE URL TO TEST: https://www.allrecipes.com/recipe/280509/stuffed-french-onion-chicken-meatballs/
@@ -287,7 +295,6 @@ def printer(title,ingredients_dict,instructions_lst,tools,methods):
     print("Instructions:")
     for i,instruction in enumerate(instructions_lst):
         print("\tStep " + str(i+1)+": "+instruction)
-
 
 #takes ingredients dictionary and replace meat and fish with veggies. Return new dictionary
 def veg_replace(dic,instructions, make_veg):
@@ -393,8 +400,6 @@ def veg_replace(dic,instructions, make_veg):
             instructions.append("Sprinkle bacon bits on dish.")
 
         return dic,instructions
-
-
 
 def health_swap(dic,instructions, make_healthy):
 
