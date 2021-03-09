@@ -59,7 +59,7 @@ def parse_url(url):
 
     while contTransformations:
 
-        print("Would you like to transform this recipe?")
+        print("Would you like to transform this recipe?\n")
         print("OPTIONS: vegetarian, non-vegetarian, healthy, unhealthy, asian cuisine, double ingredients, halve ingredients")
         print("If you would like to reset the current recipe, type \"original\"")
         print("If you would like to parse another recipe, type \"another\"")
@@ -272,7 +272,7 @@ def get_methods(steps):
     verbs = dict(sorted(verbs.items(), key=lambda item: item[1], reverse=True))
     verbs = list(verbs.keys())
     verbs[0] += " (primary)"
-    
+
     return verbs
 
 # read in the allrecipes.com url -> SAMPLE URL TO TEST: https://www.allrecipes.com/recipe/280509/stuffed-french-onion-chicken-meatballs/
