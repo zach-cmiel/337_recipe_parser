@@ -43,7 +43,7 @@ def parse_url(url):
     instructions = []
     for step in instructions_ul:
         instructions.append(step.find("div" , class_="paragraph").get_text().lstrip().rstrip())
-    
+
     ingredients_dict,ingredients_lst = get_ingredients(ingredients)
     tools_list = get_tools(instructions, ingredients_dict, title)
     methods_list = get_methods(instructions)
@@ -313,7 +313,7 @@ def veg_replace(dic,instructions, make_veg):
                 if token in meats:
                     deleting_ing.append(ing)
                     substitutions += 1
-            
+
 
         for ing in deleting_ing:
             if ing in dic.keys():
@@ -331,7 +331,7 @@ def veg_replace(dic,instructions, make_veg):
                         instructions[i] = instruction.replace(token, "")
                     elif token in instruction:
                         instructions[i] = instruction.replace(token,meat_substitutes[token])
-        
+
         if substitutions == 0:
             dic['kale'] = '2 pieces'
             instructions.append("Top with kale.")
@@ -375,7 +375,7 @@ def veg_replace(dic,instructions, make_veg):
                     elif token in instruction:
                         instructions[i] = instruction.replace(token,meats[token])
 
-        
+
         if substitutions == 0:
             dic['bacon bits'] = '1 teaspoon'
             instructions.append("Sprinkle bacon bits on dish.")
@@ -417,11 +417,11 @@ def health_swap(dic,instructions, make_healthy):
                         instructions[i] = instruction.replace(token, "")
                     elif token in instruction:
                         instructions[i] = instruction.replace(token,healthy_substitutes[token])
-        
+
         if substitutions == 0:
             dic['quinoa'] = '4 cups'
             instructions.append("Serve with quinoa.")
-        
+
         return dic,instructions
 
     else:
@@ -455,7 +455,7 @@ def health_swap(dic,instructions, make_healthy):
                         instructions[i] = instruction.replace(token, "")
                     elif token in instruction:
                         instructions[i] = instruction.replace(token,unhealthy_substitutes[token])
-        
+
         if substitutions == 0:
             dic['melted chocolate'] = '1 cup'
             instructions.append("Coat in chocolate.")
@@ -469,12 +469,14 @@ def asian_cuisine_swap(dic, instructions, make_asian):
 
         asian_substitutes = { 'pasta': 'glass noodles', 'spaghetti': 'udon noodles', 'parsley': 'green onion', 'basil': 'sesame seeds', 'harissa': 'gochujang', 'bbq sauce': 'teriyaki sauce', 'barbecue sauce': 'teriyaki sauce' }
 
+        substitutions = 0
         deleting_ing = []
         for ing in dic.keys():
             tokens = word_tokenize(ing)
             for token in tokens:
                 if token in not_asian:
                     deleting_ing.append(ing)
+                    substitutions += 1
 
         for ing in deleting_ing:
             if ing in dic.keys():
@@ -492,37 +494,46 @@ def asian_cuisine_swap(dic, instructions, make_asian):
                         instructions[i] = instruction.replace(token, "")
                     elif token in instruction:
                         instructions[i] = instruction.replace(token,asian_substitutes[token])
+
+        if substitutions == 0:
+            dic['white rice'] = '3 cups'
+            dic['soy sauce'] = '2 tablespoons'
+            instructions.append("Serve with a side of rice and soy sauce.")
+
         return dic,instructions
 
     else:
 
-        not_asian = { 'glass noodles', 'udon noodles', 'green onion', 'sesame seeds', 'gochujang', 'teriyaki sauce' }
+        asian = { 'glass noodles', 'udon noodles', 'green onion', 'sesame seeds', 'gochujang', 'teriyaki sauce' }
 
-        asian_substitutes = { 'glass noodles': 'pasta', 'udon noodles': 'spaghetti', 'green onion': 'parsley', 'sesame seeds': 'basil', 'gochujang': 'harissa', 'teriyaki sauce': 'barbecue sauce' }
+        not_asian_substitutes = { 'glass noodles': 'pasta', 'udon noodles': 'spaghetti', 'green onion': 'parsley', 'sesame seeds': 'basil', 'gochujang': 'harissa', 'teriyaki sauce': 'barbecue sauce' }
 
+        substitutions = 0
         deleting_ing = []
         for ing in dic.keys():
             tokens = word_tokenize(ing)
             for token in tokens:
-                if token in not_asian:
+                if token in asian:
                     deleting_ing.append(ing)
+                    substitutions += 1
 
         for ing in deleting_ing:
             if ing in dic.keys():
                 tokens = word_tokenize(ing)
                 for token in tokens:
-                    if token in asian_substitutes.keys():
-                        dic[asian_substitutes[token]] = dic[ing]
+                    if token in not_asian_substitutes.keys():
+                        dic[not_asian_substitutes[token]] = dic[ing]
                 del dic[ing]
 
         for i,instruction in enumerate(instructions):
             for ing in deleting_ing:
                 tokens = word_tokenize(ing)
                 for token in tokens:
-                    if token in instruction and token not in asian_substitutes.keys():
+                    if token in instruction and token not in not_asian_substitutes.keys():
                         instructions[i] = instruction.replace(token, "")
                     elif token in instruction:
-                        instructions[i] = instruction.replace(token,asian_substitutes[token])
+                        instructions[i] = instruction.replace(token,not_asian_substitutes[token])
+
         return dic,instructions
 
 if __name__ == '__main__':
