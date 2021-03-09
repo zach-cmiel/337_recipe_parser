@@ -307,6 +307,7 @@ def veg_replace(dic,instructions, make_veg):
         substitutions = 0
 
         deleting_ing = []
+        deleted_map = {}
         for ing in dic.keys():
             tokens = word_tokenize(ing)
             for token in tokens:
@@ -321,16 +322,21 @@ def veg_replace(dic,instructions, make_veg):
                 for token in tokens:
                     if token in meat_substitutes.keys():
                         dic[meat_substitutes[token]] = dic[ing]
+
+                        deleted_map[ing] = meat_substitutes[token]
                 del dic[ing]
 
         for i,instruction in enumerate(instructions):
             for ing in deleting_ing:
                 tokens = word_tokenize(ing)
                 for token in tokens:
-                    if token in instruction and token not in meat_substitutes.keys():
-                        instructions[i] = instruction.replace(token, "")
-                    elif token in instruction:
-                        instructions[i] = instruction.replace(token,meat_substitutes[token])
+                    if token in instruction:
+                        if token in meat_substitutes.keys():
+                            instructions[i] = instruction.replace(token,meat_substitutes[token])
+                        else:
+                            for old_ing in deleted_map.keys():
+                                if token in old_ing:
+                                    instructions[i] = instruction.replace(old_ing, deleted_map[old_ing])
 
         if substitutions == 0:
             dic['kale'] = '2 pieces'
@@ -351,6 +357,7 @@ def veg_replace(dic,instructions, make_veg):
 
         substitutions = 0
         deleting_ing = []
+        deleted_map = {}
         for ing in dic.keys():
             tokens = word_tokenize(ing)
             for token in tokens:
@@ -364,16 +371,21 @@ def veg_replace(dic,instructions, make_veg):
                 for token in tokens:
                     if token in meats.keys():
                         dic[meats[token]] = dic[ing]
+
+                        deleted_map[ing] = meats[token]
                 del dic[ing]
 
         for i,instruction in enumerate(instructions):
             for ing in deleting_ing:
                 tokens = word_tokenize(ing)
                 for token in tokens:
-                    if token in instruction and token not in meats.keys():
-                        instructions[i] = instruction.replace(token, "")
-                    elif token in instruction:
-                        instructions[i] = instruction.replace(token,meats[token])
+                    if token in instruction:
+                        if token in meats.keys():
+                            instructions[i] = instruction.replace(token,meats[token])
+                        else:
+                            for old_ing in deleted_map.keys():
+                                if token in old_ing:
+                                    instructions[i] = instruction.replace(token, deleted_map[old_ing])
 
 
         if substitutions == 0:
@@ -394,6 +406,7 @@ def health_swap(dic,instructions, make_healthy):
 
         substitutions = 0
         deleting_ing = []
+        deleted_map = {}
         for ing in dic.keys():
             tokens = word_tokenize(ing)
             for token in tokens:
@@ -407,16 +420,23 @@ def health_swap(dic,instructions, make_healthy):
                 for token in tokens:
                     if token in healthy_substitutes.keys():
                         dic[healthy_substitutes[token]] = dic[ing]
+
+                        deleted_map[ing] = healthy_substitutes[token]
                 del dic[ing]
 
         for i,instruction in enumerate(instructions):
             for ing in deleting_ing:
                 tokens = word_tokenize(ing)
                 for token in tokens:
-                    if token in instruction and token not in healthy_substitutes.keys():
-                        instructions[i] = instruction.replace(token, "")
-                    elif token in instruction:
-                        instructions[i] = instruction.replace(token,healthy_substitutes[token])
+                    if token in instruction:
+                        if token in healthy_substitutes.keys():
+                            instructions[i] = instruction.replace(token,healthy_substitutes[token])
+                        else:
+                            for old_ing in deleted_map.keys():
+                                if token in old_ing:
+                                    instructions[i] = instruction.replace(token, deleted_map[old_ing])
+
+                                    break
 
         if substitutions == 0:
             dic['quinoa'] = '4 cups'
@@ -432,6 +452,7 @@ def health_swap(dic,instructions, make_healthy):
 
         substitutions = 0
         deleting_ing = []
+        deleted_map = {}
         for ing in dic.keys():
             tokens = word_tokenize(ing)
             for token in tokens:
@@ -445,16 +466,21 @@ def health_swap(dic,instructions, make_healthy):
                 for token in tokens:
                     if token in unhealthy_substitutes.keys():
                         dic[unhealthy_substitutes[token]] = dic[ing]
+
+                        deleted_map[ing] = unhealthy_substitutes[token]
                 del dic[ing]
 
         for i,instruction in enumerate(instructions):
             for ing in deleting_ing:
                 tokens = word_tokenize(ing)
                 for token in tokens:
-                    if token in instruction and token not in unhealthy_substitutes.keys():
-                        instructions[i] = instruction.replace(token, "")
-                    elif token in instruction:
-                        instructions[i] = instruction.replace(token,unhealthy_substitutes[token])
+                    if token in instruction:
+                        if token in unhealthy_substitutes.keys():
+                            instructions[i] = instruction.replace(token,unhealthy_substitutes[token])
+                        else:
+                            for old_ing in deleted_map.keys():
+                                if token in old_ing:
+                                    instructions[i] = instruction.replace(token, deleted_map[old_ing])
 
         if substitutions == 0:
             dic['melted chocolate'] = '1 cup'
@@ -465,12 +491,13 @@ def health_swap(dic,instructions, make_healthy):
 def asian_cuisine_swap(dic, instructions, make_asian):
     if make_asian:
 
-        not_asian = { 'pasta', 'spaghetti', 'parsley', 'basil', 'harissa', 'bbq sauce', 'barbecue sauce' }
+        not_asian = { 'worcestershire sauce', 'apple cider vinegar', 'lettuce', 'celery', 'cabbage', 'red pepper flakes', 'pasta', 'spaghetti', 'parsley', 'basil', 'harissa', 'bbq sauce', 'barbecue sauce', 'milk' }
 
-        asian_substitutes = { 'pasta': 'glass noodles', 'spaghetti': 'udon noodles', 'parsley': 'green onion', 'basil': 'sesame seeds', 'harissa': 'gochujang', 'bbq sauce': 'teriyaki sauce', 'barbecue sauce': 'teriyaki sauce' }
+        asian_substitutes = { 'worcestershire sauce': 'hoisin sauce', 'apple cider vinegar': 'rice vinegar', 'lettuce': 'bok choy', 'celery': 'chinese celery', 'cabbage': 'kimchi', 'red pepper flakes': 'chili pepper flakes', 'milk': 'coconut milk', 'pasta': 'glass noodles', 'spaghetti': 'udon noodles', 'parsley': 'green onion', 'basil': 'sesame seeds', 'harissa': 'gochujang', 'bbq sauce': 'teriyaki sauce', 'barbecue sauce': 'teriyaki sauce' }
 
         substitutions = 0
         deleting_ing = []
+        deleted_map = {}
         for ing in dic.keys():
             tokens = word_tokenize(ing)
             for token in tokens:
@@ -484,32 +511,39 @@ def asian_cuisine_swap(dic, instructions, make_asian):
                 for token in tokens:
                     if token in asian_substitutes.keys():
                         dic[asian_substitutes[token]] = dic[ing]
+
+                        deleted_map[ing] = asian_substitutes[token]
                 del dic[ing]
 
         for i,instruction in enumerate(instructions):
             for ing in deleting_ing:
                 tokens = word_tokenize(ing)
                 for token in tokens:
-                    if token in instruction and token not in asian_substitutes.keys():
-                        instructions[i] = instruction.replace(token, "")
-                    elif token in instruction:
-                        instructions[i] = instruction.replace(token,asian_substitutes[token])
+                    if token in instruction:
+                        if token in asian_substitutes.keys():
+                            instructions[i] = instruction.replace(token,asian_substitutes[token])
+                        else:
+                            for old_ing in deleted_map.keys():
+                                if token in old_ing:
+                                    instructions[i] = instruction.replace(token, deleted_map[old_ing])
 
         if substitutions == 0:
             dic['white rice'] = '3 cups'
             dic['soy sauce'] = '2 tablespoons'
-            instructions.append("Serve with a side of rice and soy sauce.")
+            dic['sesame seeds'] = '1 teaspoon'
+            instructions.append("Sprinkle sesame seeds on top of your dish. Serve with a side of rice and soy sauce.")
 
         return dic,instructions
 
     else:
 
-        asian = { 'glass noodles', 'udon noodles', 'green onion', 'sesame seeds', 'gochujang', 'teriyaki sauce' }
+        asian = { 'hoisin sauce', 'rice vinegar', 'bok choy', 'chinese celery', 'kimchi', 'chili pepper flakes', 'glass noodles', 'udon noodles', 'green onion', 'sesame seeds', 'gochujang', 'teriyaki sauce', 'coconut milk' }
 
-        not_asian_substitutes = { 'glass noodles': 'pasta', 'udon noodles': 'spaghetti', 'green onion': 'parsley', 'sesame seeds': 'basil', 'gochujang': 'harissa', 'teriyaki sauce': 'barbecue sauce' }
+        not_asian_substitutes = { 'hoisin sauce': 'worcestershire sauce', 'rice vinegar': 'apple cider vinegar', 'bok choy': 'lettuce', 'chinese celery': 'celery', 'kimchi': 'cabbage', 'chili pepper flakes': 'red pepper flakes', 'coconut milk': 'milk', 'glass noodles': 'pasta', 'udon noodles': 'spaghetti', 'green onion': 'parsley', 'sesame seeds': 'basil', 'gochujang': 'harissa', 'teriyaki sauce': 'barbecue sauce' }
 
         substitutions = 0
         deleting_ing = []
+        deleted_map = {}
         for ing in dic.keys():
             tokens = word_tokenize(ing)
             for token in tokens:
@@ -523,16 +557,21 @@ def asian_cuisine_swap(dic, instructions, make_asian):
                 for token in tokens:
                     if token in not_asian_substitutes.keys():
                         dic[not_asian_substitutes[token]] = dic[ing]
+
+                        deleted_map[ing] = not_asian_substitutes[token]
                 del dic[ing]
 
         for i,instruction in enumerate(instructions):
             for ing in deleting_ing:
                 tokens = word_tokenize(ing)
                 for token in tokens:
-                    if token in instruction and token not in not_asian_substitutes.keys():
-                        instructions[i] = instruction.replace(token, "")
-                    elif token in instruction:
-                        instructions[i] = instruction.replace(token,not_asian_substitutes[token])
+                    if token in instruction:
+                        if token in not_asian_substitutes.keys():
+                            instructions[i] = instruction.replace(token,not_asian_substitutes[token])
+                        else:
+                            for old_ing in deleted_map.keys():
+                                if token in old_ing:
+                                    instructions[i] = instruction.replace(token, deleted_map[old_ing])
 
         return dic,instructions
 
