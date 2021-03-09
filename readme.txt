@@ -12,3 +12,7 @@ VERY VERY IMPORTANT: you must download the Spacy model using the following comma
 python -m spacy download en_core_web_lg
 
 Other models can be used, but you would have to change the model specificied on line 584. Best results were found with the large model.
+
+Refernced GitHubs:
+
+https://github.com/amitadate/EECS-337-NLP-Project-02
